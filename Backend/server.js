@@ -1,11 +1,14 @@
-import express from 'express'
-const app = express()
-const port = 3000
+import express from "express";
+import "dotenv/config";
+import transactionRoutes from "./routes/transaction.routes.js";
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.json());
+
+app.use("/transaction", transactionRoutes);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+    console.log(`App listening on port ${port}`);
+});
