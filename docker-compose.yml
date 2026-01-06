@@ -1,0 +1,15 @@
+services:
+  #Faut rajouter la db ici
+
+  backend:
+    build: 
+      context: ./Backend
+    container_name: backend-BudgetPerso
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env
+    #depends_on:
+    #  - db
+    
