@@ -1,12 +1,21 @@
-import mysql from "mysql2/promise";
-import "dotenv/config";
+import pg from "pg";
+const { Pool } = pg;
 
-// Pour la config de la bdd
-export const db = mysql.createPool({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "password",
-    database: process.env.DB_NAME || "ma_bdd",
-    waitForConnections: true,
-    connectionLimit: 10,
+const pool = new Pool({
+  host: process.env.DB_HOST || "db",
+  port: Number(process.env.DB_PORT || 5432),
+  user: process.env.DB_USER || "user",
+  password: process.env.DB_PASSWORD || "user-pwd",
+  database: process.env.DB_NAME || "mybudget",
 });
+
+pool.on("error", (err) => {
+  console.error("Unexpected PG pool error", err);
+});
+
+export const db = {
+  query: (text, params) => pool.query(text, params),
+  pool,
+};
+
+export default db;
