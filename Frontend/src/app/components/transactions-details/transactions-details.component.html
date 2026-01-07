@@ -1,0 +1,50 @@
+<div class="details-container" *ngIf="transaction">
+  <div class="header">
+    <button class="btn-back" [routerLink]="['/categories', transaction.categoryId]">← Retour</button>
+    <h1>Détails de la transaction</h1>
+  </div>
+
+  <div class="transaction-card">
+    <div class="transaction-header" [class.ajout]="transaction.type === 'ajout'" [class.retrait]="transaction.type === 'retrait'">
+      <h2>{{ transaction.libelle }}</h2>
+      <div class="amount" [class.positive]="transaction.type === 'ajout'" [class.negative]="transaction.type === 'retrait'">
+        {{ transaction.type === 'ajout' ? '+' : '-' }}{{ transaction.montant.toFixed(2) }} €
+      </div>
+    </div>
+
+    <div class="transaction-details">
+      <div class="detail-row">
+        <span class="label">Type :</span>
+        <span class="value">
+          <span class="badge" [class.badge-ajout]="transaction.type === 'ajout'" [class.badge-retrait]="transaction.type === 'retrait'">
+            {{ transaction.type === 'ajout' ? 'Ajout (Revenu)' : 'Retrait (Dépense)' }}
+          </span>
+        </span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Catégorie :</span>
+        <span class="value category-link" [routerLink]="['/categories', transaction.categoryId]">
+          {{ transaction.categoryName }}
+        </span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Date :</span>
+        <span class="value">{{ transaction.date | date:'EEEE dd MMMM yyyy':'':'fr' }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Montant :</span>
+        <span class="value amount-detail" [class.positive]="transaction.type === 'ajout'" [class.negative]="transaction.type === 'retrait'">
+          {{ transaction.montant.toFixed(2) }} €
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="error-container" *ngIf="!transaction">
+  <h2>Transaction non trouvée</h2>
+  <button class="btn-back" routerLink="/categories">← Retour aux catégories</button>
+</div>

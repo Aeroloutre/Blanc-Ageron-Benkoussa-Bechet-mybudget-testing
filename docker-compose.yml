@@ -21,7 +21,7 @@ services:
   backend:
     build:
       context: ./Backend
-    container_name: backend-BudgetPerso
+    container_name: backend
     restart: unless-stopped
     ports:
       - "3000:3000"
