@@ -11,6 +11,20 @@ const app = express();
 
 app.use(express.json());
 
+// Routes DB health
+app.get("/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+app.get("/health/db", async (req, res) => {
+  try {
+    const r = await db.query("SELECT NOW() as now");
+    res.json({ ok: true, now: r.rows[0].now });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // Les routes
 app.use("/transactions", transactionRoutes);
 app.use("/categories", categoryRoutes);
