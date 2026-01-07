@@ -1,0 +1,66 @@
+<div class="details-container" *ngIf="category">
+  <div class="header">
+    <button class="btn-back" routerLink="/categories">← Retour</button>
+    <h1>{{ category.nom }}</h1>
+  </div>
+
+  <div class="category-summary">
+    <div class="summary-card">
+      <h3>Budget alloué</h3>
+      <p class="amount">{{ category.budget }} €</p>
+    </div>
+    <div class="summary-card">
+      <h3>Total ajouts</h3>
+      <p class="amount positive">+{{ totalAjouts.toFixed(2) }} €</p>
+    </div>
+    <div class="summary-card">
+      <h3>Total retraits</h3>
+      <p class="amount negative">-{{ totalRetraits.toFixed(2) }} €</p>
+    </div>
+    <div class="summary-card">
+      <h3>Solde</h3>
+      <p class="amount" [class.positive]="solde >= 0" [class.negative]="solde < 0">
+        {{ solde >= 0 ? '+' : '' }}{{ solde.toFixed(2) }} €
+      </p>
+    </div>
+  </div>
+
+  <div class="transactions-section">
+    <div class="transactions-header">
+      <h2>Transactions</h2>
+      <button class="btn-add-transaction" (click)="ajouterTransaction()">+ Ajouter une transaction</button>
+    </div>
+    
+    <div class="transactions-list" *ngIf="category.transactions.length > 0; else noTransactions">
+      <div class="transaction-item" 
+           *ngFor="let transaction of category.transactions" 
+           (click)="voirDetailsTransaction(transaction.id)"
+           [class.ajout]="transaction.type === 'ajout'" 
+           [class.retrait]="transaction.type === 'retrait'">
+        <div class="transaction-info">
+          <div class="transaction-label">{{ transaction.libelle }}</div>
+          <div class="transaction-date">{{ transaction.date | date:'dd/MM/yyyy' }}</div>
+        </div>
+        <div class="transaction-details">
+          <span class="transaction-type" [class.type-ajout]="transaction.type === 'ajout'" 
+                [class.type-retrait]="transaction.type === 'retrait'">
+            {{ transaction.type === 'ajout' ? 'Ajout' : 'Retrait' }}
+          </span>
+          <span class="transaction-amount" [class.positive]="transaction.type === 'ajout'" 
+                [class.negative]="transaction.type === 'retrait'">
+            {{ transaction.type === 'ajout' ? '+' : '-' }}{{ transaction.montant.toFixed(2) }} €
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noTransactions>
+      <p class="no-transactions">Aucune transaction pour cette catégorie.</p>
+    </ng-template>
+  </div>
+</div>
+
+<div class="error-container" *ngIf="!category">
+  <h2>Catégorie non trouvée</h2>
+  <button class="btn-back" routerLink="/categories">← Retour aux catégories</button>
+</div>

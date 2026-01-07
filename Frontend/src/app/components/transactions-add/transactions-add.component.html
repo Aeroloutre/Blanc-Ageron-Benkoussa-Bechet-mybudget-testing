@@ -1,0 +1,63 @@
+<div class="form-container">
+  <h2>Ajouter une transaction</h2>
+  
+  <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="libelle">Libellé *</label>
+      <input 
+        type="text" 
+        id="libelle" 
+        formControlName="libelle" 
+        placeholder="Ex: Courses, Restaurant..."
+        [class.error]="transactionForm.get('libelle')?.invalid && transactionForm.get('libelle')?.touched"
+      />
+      <div class="error-message" *ngIf="transactionForm.get('libelle')?.invalid && transactionForm.get('libelle')?.touched">
+        <small *ngIf="transactionForm.get('libelle')?.errors?.['required']">Le libellé est requis</small>
+        <small *ngIf="transactionForm.get('libelle')?.errors?.['minlength']">Le libellé doit contenir au moins 2 caractères</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="type">Type *</label>
+      <select id="type" formControlName="type">
+        <option value="ajout">Ajout (Revenu)</option>
+        <option value="retrait">Retrait (Dépense)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="montant">Montant (€) *</label>
+      <input 
+        type="number" 
+        id="montant" 
+        formControlName="montant" 
+        placeholder="0.00"
+        min="0.01"
+        step="0.01"
+        [class.error]="transactionForm.get('montant')?.invalid && transactionForm.get('montant')?.touched"
+      />
+      <div class="error-message" *ngIf="transactionForm.get('montant')?.invalid && transactionForm.get('montant')?.touched">
+        <small *ngIf="transactionForm.get('montant')?.errors?.['required']">Le montant est requis</small>
+        <small *ngIf="transactionForm.get('montant')?.errors?.['min']">Le montant doit être supérieur à 0</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="date">Date *</label>
+      <input 
+        type="date" 
+        id="date" 
+        formControlName="date"
+        [class.error]="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched"
+      />
+      <div class="error-message" *ngIf="transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched">
+        <small *ngIf="transactionForm.get('date')?.errors?.['required']">La date est requise</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">Annuler</button>
+      <button type="submit" class="btn-submit" [disabled]="transactionForm.invalid">Créer</button>
+    </div>
+  </form>
+</div>

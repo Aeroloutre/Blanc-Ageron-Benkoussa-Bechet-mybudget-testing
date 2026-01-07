@@ -1,0 +1,16 @@
+<div class="categories-container">
+  <h1>Mes Catégories de Budget</h1>
+  
+  <div class="categories-grid">
+    <div class="category-card" *ngFor="let category of categories" (click)="voirDetails(category.id)">
+      <h3>{{ category.nom }}</h3>
+      <div class="category-info">
+        <p><strong>Budget:</strong> {{ category.budget }} €</p>
+        <p><strong>Dépensé:</strong> {{ category.depense }} €</p>
+        <p><strong>Restant:</strong> {{ category.budget - category.depense }} €</p>
+      </div>
+    </div>
+  </div>
+  
+  <button class="btn-ajouter" (click)="ajouterCategorie()">+ Ajouter une catégorie</button>
+</div>
