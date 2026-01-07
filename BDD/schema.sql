@@ -5,7 +5,6 @@
 CREATE TABLE categories (
     category_id SERIAL PRIMARY KEY,
     label VARCHAR(255) NOT NULL UNIQUE,
-    type VARCHAR(50) DEFAULT 'expense' CHECK (type IN ('expense', 'income')),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -103,11 +102,11 @@ ORDER BY b.period_start DESC;
 
 -- Sample data
 INSERT INTO categories (label, type) VALUES
-    ('Loisirs', 'expense'),
-    ('Transports', 'expense'),
-    ('Maison', 'expense'),
-    ('Alimentation', 'expense'),
-    ('Salaire', 'income');
+    ('Loisirs'),
+    ('Transports'),
+    ('Maison'),
+    ('Alimentation'),
+    ('Salaire');
 
 INSERT INTO transactions (amount, label, type, category_id) VALUES
     (2500.00, 'Salaire Janvier26', 'income', 5),
