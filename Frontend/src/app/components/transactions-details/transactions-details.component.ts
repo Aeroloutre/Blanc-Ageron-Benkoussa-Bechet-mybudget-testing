@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 interface Transaction {
@@ -14,12 +15,22 @@ interface Transaction {
 
 @Component({
   selector: 'app-transactions-details',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './transactions-details.component.html',
   styleUrl: './transactions-details.component.css'
 })
 export class TransactionsDetailsComponent implements OnInit {
   transaction: Transaction | null = null;
+  isEditing: boolean = false;
+  editedTransaction: Transaction = {
+    id: 0,
+    libelle: '',
+    type: 'retrait',
+    montant: 0,
+    date: new Date(),
+    categoryId: 0,
+    categoryName: ''
+  };
 
   // Mock data
   private mockTransactions: Transaction[] = [
@@ -40,5 +51,41 @@ export class TransactionsDetailsComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.transaction = this.mockTransactions.find(t => t.id === id) || null;
+  }
+
+  toggleEdit(): void {
+    if (!this.transaction) return;
+    
+    if (!this.isEditing) {
+      this.isEditing = true;
+      // Copy transaction data to editedTransaction
+      this.editedTransaction = { ...this.transaction };
+    } else {
+      this.saveTransaction();
+    }
+  }
+
+  saveTransaction(): void {
+    if (!this.transaction || !this.editedTransaction.libelle.trim() || this.editedTransaction.montant <= 0) {
+      alert('Veuillez remplir tous les champs correctement');
+      return;
+    }
+    
+    // Update transaction
+    this.transaction.libelle = this.editedTransaction.libelle.trim();
+    this.transaction.montant = this.editedTransaction.montant;
+    this.transaction.type = this.editedTransaction.type;
+    
+    this.isEditing = false;
+    
+    // TODO: Appeler le service pour sauvegarder sur le backend
+    console.log('Transaction modifiée:', this.transaction);
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    if (this.transaction) {
+      this.editedTransaction = { ...this.transaction };
+    }
   }
 }

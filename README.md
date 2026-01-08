@@ -21,28 +21,58 @@ erreurs, puis appelle le service associé.
 
 - Le fichier db.js -> Sert pour la config de la base de données.
 
-**Pour lancer le backend :**
+---
+# FRONTEND
+
+**Structure du frontend :**
+
+Le frontend est une application Angular 19 composée de :
+
+- Le dossier components -> Contient les composants Angular (home, categories, transactions).
+
+- Le dossier services -> Services HTTP pour communiquer avec l'API backend (budget.service.ts, category.service.ts, transaction.service.ts).
+
+- Le fichier app.routes.ts -> Configuration du routage de l'application.
+
+---
+# LANCER LE PROJET
+
+**Prérequis :**
+
+- Docker Desktop installé et lancé
+
+**Étapes :**
 
 - Créer un .env à la racine du projet avec :
 
+```
 DB_HOST=db
-
 DB_PORT=5432
-
 DB_USER=user
-
 DB_PASSWORD=user-pwd
-
 DB_NAME=mybudget
+```
 
-- Lancer la commande docker compose up (avec docker desktop ouvert)
+- Lancer la commande suivante pour démarrer l'ensemble du projet :
 
-- Tester la connexion avec http://localhost:3000/health/db -> ok true now "Date actuelle"
+```bash
+docker compose up --build
+```
+
+**Accès aux services :**
+
+- Frontend (Angular) : http://localhost:4200
+- Backend (API) : http://localhost:3000
+- Base de données (PostgreSQL) : localhost:5432
+
+- Tester la connexion backend avec : http://localhost:3000/health/db -> ok true now "Date actuelle"
 
 - En cas de problème, rebuild le conteneur avec :
 
+```bash
 docker compose down -v
-docker compose --build
+docker compose up --build
+```
 
 ---
 # Base De Données

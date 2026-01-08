@@ -3,6 +3,9 @@
   
   <div class="categories-grid">
     <div class="category-card" *ngFor="let category of categories" (click)="voirDetails(category.id)">
+      <button class="btn-delete" (click)="supprimerCategorie(category.id, $event)" title="Supprimer la catégorie">
+        <img src="fermer.png" alt="Supprimer" />
+      </button>
       <h3>{{ category.nom }}</h3>
       <div class="category-info">
         <p><strong>Budget:</strong> {{ category.budget }} €</p>

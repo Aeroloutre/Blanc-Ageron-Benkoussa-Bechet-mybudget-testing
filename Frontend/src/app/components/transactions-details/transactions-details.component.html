@@ -1,25 +1,55 @@
 <div class="details-container" *ngIf="transaction">
   <div class="header">
     <button class="btn-back" [routerLink]="['/categories', transaction.categoryId]">← Retour</button>
-    <h1>Détails de la transaction</h1>
+    <div class="title-section">
+      <h1>Détails de la transaction</h1>
+      <button class="btn-edit" (click)="toggleEdit()" title="Modifier la transaction">
+        <img src="modification-du-stylo.png" alt="Modifier" />
+      </button>
+    </div>
   </div>
 
   <div class="transaction-card">
-    <div class="transaction-header" [class.ajout]="transaction.type === 'ajout'" [class.retrait]="transaction.type === 'retrait'">
-      <h2>{{ transaction.libelle }}</h2>
-      <div class="amount" [class.positive]="transaction.type === 'ajout'" [class.negative]="transaction.type === 'retrait'">
+    <div class="transaction-header" [class.ajout]="isEditing ? editedTransaction.type === 'ajout' : transaction.type === 'ajout'" [class.retrait]="isEditing ? editedTransaction.type === 'retrait' : transaction.type === 'retrait'">
+      <h2 *ngIf="!isEditing">{{ transaction.libelle }}</h2>
+      <input 
+        *ngIf="isEditing" 
+        type="text" 
+        [(ngModel)]="editedTransaction.libelle" 
+        class="edit-input-name"
+        placeholder="Nom de la transaction"
+      />
+      <div class="amount" *ngIf="!isEditing" [class.positive]="transaction.type === 'ajout'" [class.negative]="transaction.type === 'retrait'">
         {{ transaction.type === 'ajout' ? '+' : '-' }}{{ transaction.montant.toFixed(2) }} €
+      </div>
+      <div class="amount-edit" *ngIf="isEditing">
+        <input 
+          type="number" 
+          [(ngModel)]="editedTransaction.montant" 
+          class="edit-input-amount"
+          step="0.01"
+          min="0"
+        />
+        <span>€</span>
       </div>
     </div>
 
     <div class="transaction-details">
       <div class="detail-row">
         <span class="label">Type :</span>
-        <span class="value">
+        <span class="value" *ngIf="!isEditing">
           <span class="badge" [class.badge-ajout]="transaction.type === 'ajout'" [class.badge-retrait]="transaction.type === 'retrait'">
             {{ transaction.type === 'ajout' ? 'Ajout (Revenu)' : 'Retrait (Dépense)' }}
           </span>
         </span>
+        <select 
+          *ngIf="isEditing" 
+          [(ngModel)]="editedTransaction.type" 
+          class="edit-select-type"
+        >
+          <option value="ajout">Ajout (Revenu)</option>
+          <option value="retrait">Retrait (Dépense)</option>
+        </select>
       </div>
 
       <div class="detail-row">
@@ -40,6 +70,11 @@
           {{ transaction.montant.toFixed(2) }} €
         </span>
       </div>
+    </div>
+
+    <div class="edit-actions" *ngIf="isEditing">
+      <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
+      <button class="btn-save" (click)="saveTransaction()">Enregistrer</button>
     </div>
   </div>
 </div>

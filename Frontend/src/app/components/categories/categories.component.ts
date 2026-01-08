@@ -25,4 +25,16 @@ export class CategoriesComponent {
   voirDetails(id: number) {
     this.router.navigate(['/categories', id]);
   }
+
+  supprimerCategorie(id: number, event: Event) {
+    event.stopPropagation(); // Prevent card click event
+    
+    const category = this.categories.find(c => c.id === id);
+    if (category && confirm(`Êtes-vous sûr de vouloir supprimer la catégorie "${category.nom}" ?`)) {
+      this.categories = this.categories.filter(c => c.id !== id);
+      
+      // TODO: Appeler le service pour supprimer sur le backend
+      console.log('Catégorie supprimée:', id);
+    }
+  }
 }

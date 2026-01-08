@@ -1,7 +1,22 @@
 <div class="details-container" *ngIf="category">
   <div class="header">
     <button class="btn-back" routerLink="/categories">← Retour</button>
-    <h1>{{ category.nom }}</h1>
+    <div class="title-section">
+      <h1 *ngIf="!isEditingName">{{ category.nom }}</h1>
+      <input 
+        *ngIf="isEditingName" 
+        type="text" 
+        [(ngModel)]="editedName" 
+        (blur)="saveCategoryName()" 
+        (keyup.enter)="saveCategoryName()" 
+        (keyup.escape)="cancelEdit()" 
+        class="edit-input"
+        #nameInput
+      />
+      <button class="btn-edit" (click)="toggleEditName()" title="Modifier le nom">
+        <img src="modification-du-stylo.png" alt="Modifier" />
+      </button>
+    </div>
   </div>
 
   <div class="category-summary">
@@ -37,6 +52,9 @@
            (click)="voirDetailsTransaction(transaction.id)"
            [class.ajout]="transaction.type === 'ajout'" 
            [class.retrait]="transaction.type === 'retrait'">
+        <button class="btn-delete-transaction" (click)="supprimerTransaction(transaction.id, $event)" title="Supprimer la transaction">
+          <img src="fermer.png" alt="Supprimer" />
+        </button>
         <div class="transaction-info">
           <div class="transaction-label">{{ transaction.libelle }}</div>
           <div class="transaction-date">{{ transaction.date | date:'dd/MM/yyyy' }}</div>
