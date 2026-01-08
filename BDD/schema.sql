@@ -100,7 +100,7 @@ GROUP BY b.budget_id, c.label, b.allocated_amount, b.period_start, b.period_end
 ORDER BY b.period_start DESC;
 
 -- Sample data
-INSERT INTO categories (label, type) VALUES
+INSERT INTO categories (label) VALUES
     ('Loisirs'),
     ('Transports'),
     ('Maison'),
