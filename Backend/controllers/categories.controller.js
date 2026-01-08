@@ -4,13 +4,11 @@ import { handleZodError } from "../helpers/handleZodError.js";
 
 // Schémas de validation
 const createCategorySchema = z.object({
-  label: z.string().min(1, "Le label ne peut pas être vide"),
-  type: z.string().optional(),
+  label: z.string().min(1, "Le label ne peut pas être vide")
 });
 
 const updateCategorySchema = z.object({
-  label: z.string().min(1, "Le label ne peut pas être vide").optional(),
-  type: z.string().optional(),
+  label: z.string().min(1, "Le label ne peut pas être vide").optional()
 });
 
 const idParamSchema = z.object({

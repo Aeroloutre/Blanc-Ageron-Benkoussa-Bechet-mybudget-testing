@@ -7,24 +7,23 @@ export const getCategories = async () => {
   return rows;
 };
 
-export const createCategory = async ({ label, type = "expense" }) => {
+export const createCategory = async ({ label }) => {
   const { rows } = await db.query(
-    `INSERT INTO categories (label, type)
+    `INSERT INTO categories (label)
      VALUES ($1, $2)
      RETURNING *`,
-    [label, type]
+    [label]
   );
   return rows[0];
 };
 
-export const updateCategory = async (id, { label, type }) => {
+export const updateCategory = async (id, { label }) => {
   const { rows } = await db.query(
     `UPDATE categories
-     SET label = COALESCE($2, label),
-         type = COALESCE($3, type)
+     SET label = COALESCE($2, label)
      WHERE category_id = $1
      RETURNING *`,
-    [id, label, type]
+    [id, label]
   );
   return rows[0];
 };
