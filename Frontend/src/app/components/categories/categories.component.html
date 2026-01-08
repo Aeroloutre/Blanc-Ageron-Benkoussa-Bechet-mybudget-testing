@@ -11,13 +11,21 @@
   </div>
   
   <div class="categories-grid" *ngIf="!loading && !error">
-    <div class="category-card" *ngFor="let category of categories" (click)="voirDetails(category.category_id!)">
-      <button class="btn-delete" (click)="supprimerCategorie(category.category_id!, $event)" title="Supprimer la catégorie">
+    <div class="category-card" *ngFor="let category of categories" (click)="seeDetails(category.category_id!)">
+      <button class="btn-delete" (click)="deleteCategory(category.category_id!, $event)" title="Supprimer la catégorie">
         <img src="fermer.png" alt="Supprimer" />
       </button>
       <h3>{{ category.label }}</h3>
       <div class="category-info">
         <p><small>Créée le: {{ category.created_at | date:'short' }}</small></p>
+      </div>
+      
+      <div class="budgets-section" *ngIf="getBudgetsForCategory(category.category_id!).length > 0">
+        <h4>Budgets associés:</h4>
+        <div class="budget-item" *ngFor="let budget of getBudgetsForCategory(category.category_id!)">
+          <p><strong>{{ budget.allocated_amount }}€</strong></p>
+          <p><small>{{ budget.period_start | date:'short' }} - {{ budget.period_end | date:'short' }}</small></p>
+        </div>
       </div>
     </div>
 
@@ -27,5 +35,5 @@
     </div>
   </div>
   
-  <button class="btn-ajouter" (click)="ajouterCategorie()" [disabled]="loading">+ Ajouter une catégorie</button>
+  <button class="btn-ajouter" (click)="addCategory()" [disabled]="loading">+ Ajouter une catégorie</button>
 </div>

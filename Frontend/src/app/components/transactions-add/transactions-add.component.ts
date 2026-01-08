@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TransactionService, Transaction } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-transactions-add',
@@ -12,11 +13,14 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 export class TransactionsAddComponent implements OnInit {
   transactionForm: FormGroup;
   categoryId: number | null = null;
+  isLoading = false;
+  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private transactionService: TransactionService
   ) {
     this.transactionForm = this.fb.group({
       libelle: ['', [Validators.required, Validators.minLength(2)]],
@@ -31,12 +35,35 @@ export class TransactionsAddComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.transactionForm.valid) {
-      console.log('Nouvelle transaction:', this.transactionForm.value);
-      // Logique pour enregistrer la transaction (à implémenter avec le service)
-      if (this.categoryId) {
-        this.router.navigate(['/categories', this.categoryId]);
-      }
+    if (this.transactionForm.valid && !this.isLoading) {
+      this.isLoading = true;
+      this.errorMessage = null;
+
+      const formValue = this.transactionForm.value;
+      const transaction: Transaction = {
+        amount: formValue.montant,
+        label: formValue.libelle,
+        type: formValue.type === 'retrait' ? 'expense' : 'income',
+        transaction_date: formValue.date,
+        category_id: this.categoryId || undefined
+      };
+
+      this.transactionService.createTransaction(transaction).subscribe({
+        next: (createdTransaction) => {
+          console.log('Transaction created:', createdTransaction);
+          this.isLoading = false;
+          if (this.categoryId) {
+            this.router.navigate(['/categories', this.categoryId]);
+          } else {
+            this.router.navigate(['/']);
+          }
+        },
+        error: (error) => {
+          console.error('Error creating transaction:', error);
+          this.isLoading = false;
+          this.errorMessage = error.error?.error || 'Une erreur est survenue lors de la création de la transaction';
+        }
+      });
     }
   }
 

@@ -40,11 +40,9 @@ export class CategoriesDetailsComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    // Load category
     this.categoryService.getCategoryById(categoryId).subscribe({
       next: (category) => {
         this.category = category;
-        // Load transactions for this category
         this.loadTransactions(categoryId);
       },
       error: (error) => {
@@ -82,13 +80,13 @@ export class CategoriesDetailsComponent implements OnInit {
     this.solde = this.totalAjouts - this.totalRetraits;
   }
 
-  ajouterTransaction() {
+  addTransaction() {
     if (this.category) {
       this.router.navigate(['/categories', this.category.category_id, 'transactions', 'add']);
     }
   }
 
-  voirDetailsTransaction(transactionId: number) {
+  seeDetailsTransaction(transactionId: number) {
     this.router.navigate(['/transactions', transactionId]);
   }
 

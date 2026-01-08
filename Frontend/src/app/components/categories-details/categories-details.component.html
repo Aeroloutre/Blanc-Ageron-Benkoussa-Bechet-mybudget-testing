@@ -39,7 +39,7 @@
   <div class="transactions-section">
     <div class="transactions-header">
       <h2>Transactions</h2>
-      <button class="btn-add-transaction" (click)="ajouterTransaction()">+ Ajouter une transaction</button>
+      <button class="btn-add-transaction" (click)="addTransaction()">+ Ajouter une transaction</button>
     </div>
     
     <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">

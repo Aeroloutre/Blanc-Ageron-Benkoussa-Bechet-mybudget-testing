@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CategoryService, Category } from '../../services/category.service';
+import { BudgetService, Budget } from '../../services/budget.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-categories',
@@ -11,12 +13,14 @@ import { CategoryService, Category } from '../../services/category.service';
 })
 export class CategoriesComponent implements OnInit {
   categories: Category[] = [];
+  budgets: Budget[] = [];
   loading = false;
   error: string | null = null;
 
   constructor(
     private router: Router,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private budgetService: BudgetService
   ) {}
 
   ngOnInit() {
@@ -28,11 +32,15 @@ export class CategoriesComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    this.categoryService.getCategories().subscribe({
-      next: (categories) => {
+    forkJoin({
+      categories: this.categoryService.getCategories(),
+      budgets: this.budgetService.getBudgets()
+    }).subscribe({
+      next: ({ categories, budgets }) => {
         console.log('[CategoriesComponent] Categories loaded successfully:', categories);
-        console.log('[CategoriesComponent] Number of categories:', categories.length);
+        console.log('[CategoriesComponent] Budgets loaded successfully:', budgets);
         this.categories = categories;
+        this.budgets = budgets;
         this.loading = false;
       },
       error: (error) => {
@@ -48,15 +56,19 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  ajouterCategorie() {
+  getBudgetsForCategory(categoryId: number): Budget[] {
+    return this.budgets.filter(b => b.category_id === categoryId);
+  }
+
+  addCategory() {
     this.router.navigate(['/categories/add']);
   }
 
-  voirDetails(id: number) {
+  seeDetails(id: number) {
     this.router.navigate(['/categories', id]);
   }
 
-  supprimerCategorie(id: number, event: Event) {
+  deleteCategory(id: number, event: Event) {
     event.stopPropagation();
     
     const category = this.categories.find(c => c.category_id === id);
