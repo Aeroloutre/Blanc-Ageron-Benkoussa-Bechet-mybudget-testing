@@ -9,6 +9,24 @@ export const getBudgets = async (req, res, next) => {
   }
 };
 
+export const getBudgetById = async (req, res, next) => {
+  console.log("HIT /budgets/:id", req.params.id);
+
+  try {
+    const budget = await service.getBudgetById(
+      req.params.id
+    );
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget introuvable" });
+    }
+
+    res.json(budget);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const createBudget = async (req, res, next) => {
   try {
     const { category_id, allocated_amount, period_start, period_end } = req.body;

@@ -1,0 +1,21 @@
+meta {
+  name: Update_transaction
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://localhost:3000/transactions/4
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "amount" : 500.00,
+    "label" : "Café",
+    "type" : "expense",
+    "transaction_date" : "2026-01-06",
+    "category_id" : 1
+  }
+}
