@@ -8,16 +8,19 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
     "pg": "^8.16.3",
-    "dotenv": "^16.6.1"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "jest": "^29.7.0"
   },
   "jest": {
     "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [".js"],
+    "extensionsToTreatAsEsm": [
+      ".js"
+    ],
     "transform": {}
   }
 }
