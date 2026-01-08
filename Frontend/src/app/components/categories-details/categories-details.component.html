@@ -1,8 +1,8 @@
-<div class="details-container" *ngIf="category">
+<div class="details-container" *ngIf="category && !loading">
   <div class="header">
     <button class="btn-back" routerLink="/categories">← Retour</button>
     <div class="title-section">
-      <h1 *ngIf="!isEditingName">{{ category.nom }}</h1>
+      <h1 *ngIf="!isEditingName">{{ category.label }}</h1>
       <input 
         *ngIf="isEditingName" 
         type="text" 
@@ -21,15 +21,11 @@
 
   <div class="category-summary">
     <div class="summary-card">
-      <h3>Budget alloué</h3>
-      <p class="amount">{{ category.budget }} €</p>
-    </div>
-    <div class="summary-card">
-      <h3>Total ajouts</h3>
+      <h3>Total revenus</h3>
       <p class="amount positive">+{{ totalAjouts.toFixed(2) }} €</p>
     </div>
     <div class="summary-card">
-      <h3>Total retraits</h3>
+      <h3>Total dépenses</h3>
       <p class="amount negative">-{{ totalRetraits.toFixed(2) }} €</p>
     </div>
     <div class="summary-card">
@@ -46,27 +42,27 @@
       <button class="btn-add-transaction" (click)="ajouterTransaction()">+ Ajouter une transaction</button>
     </div>
     
-    <div class="transactions-list" *ngIf="category.transactions.length > 0; else noTransactions">
+    <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">
       <div class="transaction-item" 
-           *ngFor="let transaction of category.transactions" 
-           (click)="voirDetailsTransaction(transaction.id)"
-           [class.ajout]="transaction.type === 'ajout'" 
-           [class.retrait]="transaction.type === 'retrait'">
-        <button class="btn-delete-transaction" (click)="supprimerTransaction(transaction.id, $event)" title="Supprimer la transaction">
+           *ngFor="let transaction of transactions" 
+           (click)="voirDetailsTransaction(transaction.transaction_id!)"
+           [class.ajout]="transaction.type === 'income'" 
+           [class.retrait]="transaction.type === 'expense'">
+        <button class="btn-delete-transaction" (click)="supprimerTransaction(transaction.transaction_id!, $event)" title="Supprimer la transaction">
           <img src="fermer.png" alt="Supprimer" />
         </button>
         <div class="transaction-info">
-          <div class="transaction-label">{{ transaction.libelle }}</div>
-          <div class="transaction-date">{{ transaction.date | date:'dd/MM/yyyy' }}</div>
+          <div class="transaction-label">{{ transaction.label || 'Sans libellé' }}</div>
+          <div class="transaction-date">{{ transaction.transaction_date | date:'dd/MM/yyyy' }}</div>
         </div>
         <div class="transaction-details">
-          <span class="transaction-type" [class.type-ajout]="transaction.type === 'ajout'" 
-                [class.type-retrait]="transaction.type === 'retrait'">
-            {{ transaction.type === 'ajout' ? 'Ajout' : 'Retrait' }}
+          <span class="transaction-type" [class.type-ajout]="transaction.type === 'income'" 
+                [class.type-retrait]="transaction.type === 'expense'">
+            {{ transaction.type === 'income' ? 'Revenu' : 'Dépense' }}
           </span>
-          <span class="transaction-amount" [class.positive]="transaction.type === 'ajout'" 
-                [class.negative]="transaction.type === 'retrait'">
-            {{ transaction.type === 'ajout' ? '+' : '-' }}{{ transaction.montant.toFixed(2) }} €
+          <span class="transaction-amount" [class.positive]="transaction.type === 'income'" 
+                [class.negative]="transaction.type === 'expense'">
+            {{ transaction.type === 'income' ? '+' : '-' }}{{ transaction.amount }} €
           </span>
         </div>
       </div>
@@ -78,7 +74,16 @@
   </div>
 </div>
 
-<div class="error-container" *ngIf="!category">
+<div class="loading-container" *ngIf="loading">
+  <p>Chargement...</p>
+</div>
+
+<div class="error-container" *ngIf="error">
+  <h2>{{ error }}</h2>
+  <button class="btn-back" routerLink="/categories">← Retour aux catégories</button>
+</div>
+
+<div class="error-container" *ngIf="!category && !loading && !error">
   <h2>Catégorie non trouvée</h2>
   <button class="btn-back" routerLink="/categories">← Retour aux catégories</button>
 </div>

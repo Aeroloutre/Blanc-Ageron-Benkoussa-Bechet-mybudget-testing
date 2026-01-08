@@ -2,21 +2,8 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-
-interface Transaction {
-  id: number;
-  libelle: string;
-  type: 'ajout' | 'retrait';
-  montant: number;
-  date: Date;
-}
-
-interface Category {
-  id: number;
-  nom: string;
-  budget: number;
-  transactions: Transaction[];
-}
+import { CategoryService, Category } from '../../services/category.service';
+import { TransactionService, Transaction } from '../../services/transaction.service';
 
 @Component({
   selector: 'app-categories-details',
@@ -26,77 +13,78 @@ interface Category {
 })
 export class CategoriesDetailsComponent implements OnInit {
   category: Category | null = null;
+  transactions: Transaction[] = [];
   totalAjouts: number = 0;
   totalRetraits: number = 0;
   solde: number = 0;
   isEditingName: boolean = false;
   editedName: string = '';
+  loading = false;
+  error: string | null = null;
   
   @ViewChild('nameInput') nameInput!: ElementRef;
 
-  // Mock data - à remplacer par un appel au service plus tard
-  private mockCategories: Category[] = [
-    {
-      id: 1,
-      nom: 'Alimentation',
-      budget: 300,
-      transactions: [
-        { id: 1, libelle: 'Courses Leclerc', type: 'retrait', montant: 45.50, date: new Date('2026-01-03') },
-        { id: 2, libelle: 'Restaurant', type: 'retrait', montant: 28.00, date: new Date('2026-01-04') },
-        { id: 3, libelle: 'Boulangerie', type: 'retrait', montant: 12.30, date: new Date('2026-01-05') },
-        { id: 4, libelle: 'Remboursement repas', type: 'ajout', montant: 15.00, date: new Date('2026-01-06') }
-      ]
-    },
-    {
-      id: 2,
-      nom: 'Logement',
-      budget: 800,
-      transactions: [
-        { id: 5, libelle: 'Loyer janvier', type: 'retrait', montant: 650.00, date: new Date('2026-01-01') },
-        { id: 6, libelle: 'Électricité', type: 'retrait', montant: 75.00, date: new Date('2026-01-02') },
-        { id: 7, libelle: 'Aide au logement', type: 'ajout', montant: 200.00, date: new Date('2026-01-05') }
-      ]
-    },
-    {
-      id: 3,
-      nom: 'Loisirs',
-      budget: 150,
-      transactions: [
-        { id: 8, libelle: 'Cinéma', type: 'retrait', montant: 22.00, date: new Date('2026-01-02') },
-        { id: 9, libelle: 'Livre', type: 'retrait', montant: 18.50, date: new Date('2026-01-04') },
-        { id: 10, libelle: 'Concert', type: 'retrait', montant: 45.00, date: new Date('2026-01-05') }
-      ]
-    }
-  ];
-
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private categoryService: CategoryService,
+    private transactionService: TransactionService
+  ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('categoryId'));
-    this.category = this.mockCategories.find(c => c.id === id) || null;
-    
-    if (this.category) {
-      this.calculateTotals();
-    }
+    this.loadCategoryAndTransactions(id);
+  }
+
+  loadCategoryAndTransactions(categoryId: number): void {
+    this.loading = true;
+    this.error = null;
+
+    // Load category
+    this.categoryService.getCategoryById(categoryId).subscribe({
+      next: (category) => {
+        this.category = category;
+        // Load transactions for this category
+        this.loadTransactions(categoryId);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement de la catégorie:', error);
+        this.error = 'Impossible de charger la catégorie.';
+        this.loading = false;
+      }
+    });
+  }
+
+  loadTransactions(categoryId: number): void {
+    this.transactionService.getTransactions({ category_id: categoryId }).subscribe({
+      next: (transactions) => {
+        this.transactions = transactions;
+        this.calculateTotals();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des transactions:', error);
+        this.error = 'Impossible de charger les transactions.';
+        this.loading = false;
+      }
+    });
   }
 
   calculateTotals(): void {
-    if (!this.category) return;
+    this.totalAjouts = this.transactions
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
     
-    this.totalAjouts = this.category.transactions
-      .filter(t => t.type === 'ajout')
-      .reduce((sum, t) => sum + t.montant, 0);
-    
-    this.totalRetraits = this.category.transactions
-      .filter(t => t.type === 'retrait')
-      .reduce((sum, t) => sum + t.montant, 0);
+    this.totalRetraits = this.transactions
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
     
     this.solde = this.totalAjouts - this.totalRetraits;
   }
 
   ajouterTransaction() {
     if (this.category) {
-      this.router.navigate(['/categories', this.category.id, 'transactions', 'add']);
+      this.router.navigate(['/categories', this.category.category_id, 'transactions', 'add']);
     }
   }
 
@@ -109,7 +97,7 @@ export class CategoriesDetailsComponent implements OnInit {
     
     if (!this.isEditingName) {
       this.isEditingName = true;
-      this.editedName = this.category.nom;
+      this.editedName = this.category.label;
       // Focus input after view update
       setTimeout(() => {
         if (this.nameInput) {
@@ -128,35 +116,44 @@ export class CategoriesDetailsComponent implements OnInit {
       return;
     }
     
-    // Update category name
-    this.category.nom = this.editedName.trim();
-    this.isEditingName = false;
-    
-    // TODO: Appeler le service pour sauvegarder sur le backend
-    console.log('Nom de la catégorie modifié:', this.category.nom);
+    const categoryId = this.category.category_id!;
+    this.categoryService.updateCategory(categoryId, { label: this.editedName.trim() }).subscribe({
+      next: (updatedCategory) => {
+        this.category = updatedCategory;
+        this.isEditingName = false;
+        console.log('Nom de la catégorie modifié:', updatedCategory.label);
+      },
+      error: (error) => {
+        console.error('Erreur lors de la modification:', error);
+        alert('Impossible de modifier le nom de la catégorie.');
+        this.cancelEdit();
+      }
+    });
   }
 
   cancelEdit(): void {
     this.isEditingName = false;
     if (this.category) {
-      this.editedName = this.category.nom;
+      this.editedName = this.category.label;
     }
   }
 
   supprimerTransaction(transactionId: number, event: Event): void {
-    event.stopPropagation(); // Prevent card click event
+    event.stopPropagation();
     
-    if (!this.category) return;
-    
-    const transaction = this.category.transactions.find(t => t.id === transactionId);
-    if (transaction && confirm(`Êtes-vous sûr de vouloir supprimer la transaction "${transaction.libelle}" ?`)) {
-      this.category.transactions = this.category.transactions.filter(t => t.id !== transactionId);
-      
-      // Recalculate totals after deletion
-      this.calculateTotals();
-      
-      // TODO: Appeler le service pour supprimer sur le backend
-      console.log('Transaction supprimée:', transactionId);
+    const transaction = this.transactions.find(t => t.transaction_id === transactionId);
+    if (transaction && confirm(`Êtes-vous sûr de vouloir supprimer la transaction "${transaction.label}" ?`)) {
+      this.transactionService.deleteTransaction(transactionId).subscribe({
+        next: () => {
+          this.transactions = this.transactions.filter(t => t.transaction_id !== transactionId);
+          this.calculateTotals();
+          console.log('Transaction supprimée:', transactionId);
+        },
+        error: (error) => {
+          console.error('Erreur lors de la suppression:', error);
+          alert('Impossible de supprimer la transaction.');
+        }
+      });
     }
   }
 }
