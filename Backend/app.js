@@ -4,6 +4,7 @@ import 'dotenv/config';
 import transactionRoutes from "./routes/transactions.route.js";
 import categoryRoutes from "./routes/categories.route.js";
 import budgetRoutes from "./routes/budgets.route.js";
+import db from "./db.js";
 
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
