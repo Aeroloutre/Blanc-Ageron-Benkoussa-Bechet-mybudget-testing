@@ -45,7 +45,7 @@
     <div class="transactions-list" *ngIf="transactions.length > 0; else noTransactions">
       <div class="transaction-item" 
            *ngFor="let transaction of transactions" 
-           (click)="voirDetailsTransaction(transaction.transaction_id!)"
+           (click)="seeDetailsTransaction(transaction.transaction_id!)"
            [class.ajout]="transaction.type === 'income'" 
            [class.retrait]="transaction.type === 'expense'">
         <button class="btn-delete-transaction" (click)="supprimerTransaction(transaction.transaction_id!, $event)" title="Supprimer la transaction">

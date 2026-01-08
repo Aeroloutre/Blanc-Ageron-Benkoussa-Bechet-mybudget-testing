@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import 'dotenv/config';
 
 import transactionRoutes from "./routes/transactions.route.js";
@@ -9,6 +10,13 @@ import db from "./db.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
+
+// Configure CORS to allow requests from the frontend
+app.use(cors({
+  origin: 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true
+}));
 
 app.use(express.json());
 
