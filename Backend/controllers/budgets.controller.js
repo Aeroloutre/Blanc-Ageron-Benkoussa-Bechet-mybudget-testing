@@ -1,4 +1,27 @@
+import { z } from "zod";
 import * as service from "../services/budgets.service.js";
+import { handleZodError } from "../helpers/handleZodError.js";
+
+// Schémas de validation
+const createBudgetSchema = z.object({
+  category_id: z.number().int().positive("L'ID de catégorie doit être un entier positif"),
+  allocated_amount: z.number().positive("Le montant alloué doit être positif"),
+  period_start: z.string("La date de début doit être au format YYYY-MM-DD"),
+  period_end: z.string("La date de fin doit être au format YYYY-MM-DD"),
+});
+
+const updateBudgetSchema = z.object({
+  category_id: z.number().int().positive("L'ID de catégorie doit être un entier positif").optional(),
+  allocated_amount: z.number().positive("Le montant alloué doit être positif").optional(),
+  period_start: z.string("La date de début doit être au format YYYY-MM-DD")
+    .optional(),
+  period_end: z.string("La date de fin doit être au format YYYY-MM-DD")
+    .optional(),
+});
+
+const idParamSchema = z.object({
+  id: z.string().regex(/^\d+$/, "L'ID doit être un nombre").transform(Number),
+});
 
 export const getBudgets = async (req, res, next) => {
   try {
@@ -11,39 +34,40 @@ export const getBudgets = async (req, res, next) => {
 
 export const createBudget = async (req, res, next) => {
   try {
-    const { category_id, allocated_amount, period_start, period_end } = req.body;
-
-    if (!category_id || !allocated_amount || !period_start || !period_end) {
-      return res.status(400).json({ error: "Champs manquants" });
-    }
-
-    const budget = await service.createBudget({
-      category_id,
-      allocated_amount,
-      period_start,
-      period_end,
-    });
-
+    const validatedData = createBudgetSchema.parse(req.body);
+    const budget = await service.createBudget(validatedData);
     res.status(201).json(budget);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return handleZodError(err, res);
+    }
     next(err);
   }
 };
 
 export const updateBudget = async (req, res, next) => {
   try {
-    const budget = await service.updateBudget(req.params.id, req.body);
+    const { id } = idParamSchema.parse(req.params);
+    const validatedData = updateBudgetSchema.parse(req.body);
+    const budget = await service.updateBudget(id, validatedData);
     res.json(budget);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return handleZodError(err, res);
+    }
     next(err);
   }
 };
 
 export const deleteBudget = async (req, res, next) => {
   try {
-    await service.deleteBudget(req.params.id);
+    const { id } = idParamSchema.parse(req.params);
+    await service.deleteBudget(id);
     res.status(204).end();
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return handleZodError(err, res);
+    }
     next(err);
   }
 };
