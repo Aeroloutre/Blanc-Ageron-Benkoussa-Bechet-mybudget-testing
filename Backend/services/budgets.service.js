@@ -10,6 +10,14 @@ export const getBudgets = async () => {
   return rows;
 };
 
+export const getBudgetById = async (id) => {
+  const { rows } = await db.query(
+    `SELECT * FROM budgets WHERE budget_id = $1`,
+    [id]
+  );
+  return rows[0];
+};
+
 export const createBudget = async (data) => {
   const { rows } = await db.query(
     `INSERT INTO budgets (category_id, allocated_amount, period_start, period_end)

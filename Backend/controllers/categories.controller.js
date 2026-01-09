@@ -24,6 +24,22 @@ export const getCategories = async (req, res, next) => {
   }
 };
 
+export const getCategoriesById = async (req, res, next) => {
+  try {
+    const categroy = await service.getCategoriesById(
+      req.params.id
+    );
+
+    if (!categroy) {
+      return res.status(404).json({ error: "categroy introuvable" });
+    }
+
+    res.json(categroy);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const createCategory = async (req, res, next) => {
   try {
     const validatedData = createCategorySchema.parse(req.body);

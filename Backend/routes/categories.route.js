@@ -4,6 +4,7 @@ import * as controller from "../controllers/categories.controller.js";
 const router = express.Router();
 
 router.get("/", controller.getCategories);
+router.get("/:id", controller.getCategoriesById);
 
 router.post("/", controller.createCategory);
 
