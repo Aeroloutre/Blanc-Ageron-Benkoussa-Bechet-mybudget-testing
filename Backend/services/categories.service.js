@@ -7,6 +7,14 @@ export const getCategories = async () => {
   return rows;
 };
 
+export const getCategoriesById = async (id) => {
+  const { rows } = await db.query(
+    `SELECT * FROM categories WHERE category_id = $1`,
+    [id]
+  );
+  return rows[0];
+};
+
 export const createCategory = async ({ label }) => {
   const { rows } = await db.query(
     `INSERT INTO categories (label)

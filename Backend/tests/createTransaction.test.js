@@ -16,11 +16,11 @@ describe('createTransaction', () => {
 
   test('Créer une transaction', async () => {
     const transactionData = {
-      montant: 50.00,
-      libelle: 'Café',
-      type: 'expense',
-      date: '2026-01-06',
-      id_categorie: 1
+      "amount" : 50.00,
+      "label" : "Café",
+      "type" : "expense",
+      "transaction_date" : "2026-01-06",
+      "category_id" : 1
     };
 
     mockExecute.mockResolvedValue([{ insertId: 123 }]);
@@ -28,7 +28,7 @@ describe('createTransaction', () => {
     const result = await createTransaction(transactionData);
     
     expect(mockExecute).toHaveBeenCalledWith(//verifie qye la fonctiona a ete apelle avec les bon argument 
-      'INSERT INTO transactions (montant, libelle, type, date, id_categorie) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO transactions (amount, label, type, transaction_date, category_id) VALUES (?, ?, ?, ?, ?)',
       [50.00, 'Café', 'expense', '2026-01-06', 1]
     );
     expect(result.id).toBe(123);
