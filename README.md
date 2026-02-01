@@ -75,8 +75,30 @@ docker compose up --build
 ```
 
 ---
+# TESTS
+
+```bash
+cd Backend
+npm test                  # Lancer tous les tests
+npm run test:coverage     # Voir la couverture (objectif : 80%)
+```
+
+---
 # Base De Données
 
 **Le schéma de la base de donnée :**
 
 ![alt schema_de_donnees](schema_de_donnees.png)
+
+---
+# Fonctionnalités
+
+**MVP :**
+- Saisie de transactions (revenus/dépenses)
+- Gestion des budgets par catégorie
+- Filtres : type, date, catégorie
+
+**Feature B : Alertes budgétaires**
+- Alerte WARNING à 80% du budget
+- Alerte OVER_BUDGET si dépassement
+- Endpoint : `GET /budgets/alerts`

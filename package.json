@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2"
   }
 }

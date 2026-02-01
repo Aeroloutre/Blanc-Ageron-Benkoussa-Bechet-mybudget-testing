@@ -89,3 +89,29 @@ export const deleteBudget = async (req, res, next) => {
     next(err);
   }
 };
+
+
+
+
+export const getBudgetAlerts = async (req, res, next) => {
+  try {
+    const alerts = await service.getBudgetAlerts();
+    res.json({ alerts, count: alerts.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+export const createBudgetWithRollover = async (req, res, next) => {
+  try {
+    const validatedData = createBudgetSchema.parse(req.body);
+    const budget = await service.createBudgetWithRollover(validatedData);
+    res.status(201).json(budget);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return handleZodError(err, res);
+    }
+    next(err);
+  }
+};
