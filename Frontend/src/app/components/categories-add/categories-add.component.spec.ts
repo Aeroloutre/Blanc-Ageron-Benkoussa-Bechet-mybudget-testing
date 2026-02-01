@@ -82,4 +82,5 @@ describe('CategoriesAddComponent', () => {
 
     expect(categoryService.createCategory).not.toHaveBeenCalled();
   });
+
 });
