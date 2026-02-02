@@ -5,7 +5,11 @@ import 'dotenv/config';
 import transactionRoutes from "./routes/transactions.route.js";
 import categoryRoutes from "./routes/categories.route.js";
 import budgetRoutes from "./routes/budgets.route.js";
+import dbRoutes from "./routes/db.route.js";
 import db from "./db.js";
+console.log("🟢 Imports OK");
+
+console.log("🟢 dbRoutes importé");
 
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
@@ -38,6 +42,7 @@ app.get("/health/db", async (req, res) => {
 app.use("/transactions", transactionRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/budgets", budgetRoutes);
+app.use("/database", dbRoutes);
 
 // Le middleware d'errreur centarlisé
 app.use(errorMiddleware);
