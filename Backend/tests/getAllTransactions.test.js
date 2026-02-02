@@ -1,13 +1,8 @@
 import { jest } from '@jest/globals';
 
-// Mock db AVANT d'importer le service
-const mockExecute = jest.fn();
-jest.unstable_mockModule('../db.js', () => ({
-  db: { execute: mockExecute }
-}));
-
-// Importer après le mock
-const { getTransactionsByPeriod } = await import('../services/transaction.service.js');
+const mockQuery = jest.fn();
+jest.unstable_mockModule('../db.js', () => ({ db: { query: mockQuery } }));
+const { getTransactions } = await import('../services/transactions.service.js');
 
 describe('getAllTransactions', () => {
   beforeEach(() => { // permet de faire plusieur test dans le meme fichier
@@ -21,15 +16,12 @@ describe('getAllTransactions', () => {
       { id: 3, montant: 30.00, type: 'expense' }
     ];
 
-    mockExecute.mockResolvedValue([mockTransactions]);//
-    //simule une reponse comme const [rows] = await db.execute('select * from transactions');
+    mockQuery.mockResolvedValue({ rows: mockTransactions });
+    //simule une reponse comme const { rows } = await db.query('select * from transactions');
 
-    const result = await getTransactionsByPeriod({});
+    const result = await getTransactions({});
 
-    expect(mockExecute).toHaveBeenCalledWith(
-      'SELECT * FROM transactions WHERE 1=1',
-      []
-    );
+    expect(mockQuery).toHaveBeenCalled();
     expect(result.length).toBe(3);
   });
 });

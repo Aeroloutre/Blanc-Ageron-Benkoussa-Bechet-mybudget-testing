@@ -1,13 +1,13 @@
 import { jest } from '@jest/globals';
 
 // Mock db AVANT d'importer le service
-const mockExecute = jest.fn();
+const mockQuery = jest.fn();
 jest.unstable_mockModule('../db.js', () => ({
-  db: { execute: mockExecute }
+  db: { query: mockQuery }
 }));
 
 // Importer après le mock
-const { getTransactionsByPeriod } = await import('../services/transaction.service.js');
+const { getTransactions } = await import('../services/transactions.service.js');
 
 describe('getTransactionsByPeriod', () => {
   beforeEach(() => {
@@ -20,14 +20,14 @@ describe('getTransactionsByPeriod', () => {
       { id: 2, montant: 100.00, type: 'expense' }
     ];
 
-    mockExecute.mockResolvedValue([mockTransactions]);
+    mockQuery.mockResolvedValue({ rows: mockTransactions });
 
-    const result = await getTransactionsByPeriod({ 
+    const result = await getTransactions({ 
       date_after: '2026-01-01', 
       date_before: '2026-01-07' 
     });
 
-    expect(mockExecute).toHaveBeenCalled();
+    expect(mockQuery).toHaveBeenCalled();
     expect(result).toEqual(mockTransactions);
   });
 });

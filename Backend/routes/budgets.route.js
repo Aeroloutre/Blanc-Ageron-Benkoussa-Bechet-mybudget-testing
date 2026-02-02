@@ -12,4 +12,8 @@ router.put("/:id", controller.updateBudget);
 
 router.delete("/:id", controller.deleteBudget);
 
+router.get("/alerts", controller.getBudgetAlerts);
+
+router.post("/rollover", controller.createBudgetWithRollover);
+
 export default router;
