@@ -1,11 +1,13 @@
 export const handleZodError = (error, res) => {
-  const errors = error.errors.map((err) => ({
+  // Pour que zod puisse utiliser .errors
+  
+  const zodErrors = error.issues || error.errors || [];
+  const errors = zodErrors.map((err) => ({
     field: err.path.join("."),
     message: err.message,
   }));
   
   return res.status(400).json({
-    error: "Erreur lors de la validation des paramètres",
-    details: errors,
+    errors: errors,
   });
 };
