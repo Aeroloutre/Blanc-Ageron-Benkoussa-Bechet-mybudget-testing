@@ -1,13 +1,8 @@
 import { jest } from '@jest/globals';
 
-// Mock db AVANT d'importer le service
-const mockExecute = jest.fn();
-jest.unstable_mockModule('../db.js', () => ({
-  db: { execute: mockExecute }
-}));
-
-// Importer apres le mock
-const { createTransaction } = await import('../services/transaction.service.js');
+const mockQuery = jest.fn();
+jest.unstable_mockModule('../db.js', () => ({ db: { query: mockQuery } }));
+const { createTransaction } = await import('../services/transactions.service.js');
 
 describe('createTransaction', () => {
   beforeEach(() => {
@@ -23,15 +18,17 @@ describe('createTransaction', () => {
       "category_id" : 1
     };
 
-    mockExecute.mockResolvedValue([{ insertId: 123 }]);
+    mockQuery.mockResolvedValue({ 
+      rows: [{ transaction_id: 123, amount: 50.00, label: 'Café', type: 'expense', transaction_date: '2026-01-06', category_id: 1 }] 
+    });
 
     const result = await createTransaction(transactionData);
     
-    expect(mockExecute).toHaveBeenCalledWith(//verifie qye la fonctiona a ete apelle avec les bon argument 
-      'INSERT INTO transactions (amount, label, type, transaction_date, category_id) VALUES (?, ?, ?, ?, ?)',
+    expect(mockQuery).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT INTO transactions'),
       [50.00, 'Café', 'expense', '2026-01-06', 1]
     );
-    expect(result.id).toBe(123);
-    expect(result.montant).toBe(50.00);
+    expect(result.transaction_id).toBe(123);
+    expect(result.amount).toBe(50.00);
   });
 });

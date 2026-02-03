@@ -1,5 +1,6 @@
 import { z } from "zod";
 import * as transactionService from "../services/transactions.service.js";
+import * as budgetService from "../services/budgets.service.js";  
 import { handleZodError } from "../helpers/handleZodError.js";
 
 // Schémas de validation
@@ -40,8 +41,14 @@ const idParamSchema = z.object({
 export const createTransaction = async (req, res, next) => {
   try {
     const validatedData = createTransactionSchema.parse(req.body);
+    // Vérifier l'impact sur le budget AVANT de créer
+    const budgetCheck = await budgetService.checkBudgetAfterTransaction(validatedData);
     const transaction = await transactionService.createTransaction(validatedData);
-    res.status(201).json(transaction);
+    // Inclure l'alerte dans la réponse si nécessaire
+    res.status(201).json({
+      transaction,
+      ...(budgetCheck.alert && { alert: budgetCheck })
+    });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return handleZodError(err, res);
