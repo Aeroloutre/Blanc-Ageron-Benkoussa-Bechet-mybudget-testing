@@ -8,14 +8,16 @@
 
 ### Critères d'acceptation
 
-Critère 1:  Tableau avec montant, libellé, type, catégorie, date |
+Critère 1: Tableau avec montant, libellé, type, catégorie, date |
 Critère 2: Revenus en vert, dépenses en rouge |
-Critère 3: Filtre par période (date début/fin) |
-Critère 4: Filtre par catégorie (menu déroulant) |
-Critère 5: Filtre par type (revenus/dépenses/tous) |
-Critère 6: Filtres en temps réel sans rechargement |
-Critère 7: Affichage du total et du solde |
-Critère 8: Message si aucun résultat |
+Critère 3: Création d'un budget alloué pour une catégorie |
+Critère 4: Modification du montant et des dates d'un budget existant |
+Critère 5: Filtre par période (date début/fin) |
+Critère 6: Filtre par catégorie (menu déroulant) |
+Critère 7: Filtre par type (revenus/dépenses/tous) |
+Critère 8: Filtres en temps réel sans rechargement |
+Critère 9: Affichage du total et du solde (avec budget: budget - dépenses, sans budget: revenus - dépenses) |
+Critère 10: Message si aucun résultat |
 
 ### Scénarios
 
