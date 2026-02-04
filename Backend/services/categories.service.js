@@ -18,7 +18,7 @@ export const getCategoriesById = async (id) => {
 export const createCategory = async ({ label }) => {
   const { rows } = await db.query(
     `INSERT INTO categories (label)
-     VALUES ($1, $2)
+     VALUES ($1)
      RETURNING *`,
     [label]
   );
