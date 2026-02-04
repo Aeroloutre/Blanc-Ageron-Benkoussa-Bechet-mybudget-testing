@@ -4,10 +4,11 @@ import { Router } from '@angular/router';
 import { CategoryService, Category } from '../../services/category.service';
 import { BudgetService, Budget } from '../../services/budget.service';
 import { forkJoin } from 'rxjs';
+import { DbComponent } from "../db/db.component";
 
 @Component({
   selector: 'app-categories',
-  imports: [CommonModule],
+  imports: [CommonModule, DbComponent],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css'
 })
