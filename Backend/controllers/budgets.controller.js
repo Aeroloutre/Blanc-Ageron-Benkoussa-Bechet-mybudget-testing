@@ -20,7 +20,7 @@ const updateBudgetSchema = z.object({
 });
 
 const idParamSchema = z.object({
-  id: z.string().regex(/^\d+$/, "L'ID doit être un nombre").transform(Number),
+  id: z.coerce.number().int("L'ID doit être un entier valide"),
 });
 
 export const getBudgets = async (req, res, next) => {

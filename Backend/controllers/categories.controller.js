@@ -12,7 +12,7 @@ const updateCategorySchema = z.object({
 });
 
 const idParamSchema = z.object({
-  id: z.number().int("L'ID doit être un ID valide"),
+  id: z.coerce.number().int("L'ID doit être un ID valide"),
 });
 
 export const getCategories = async (req, res, next) => {
