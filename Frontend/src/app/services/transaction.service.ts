@@ -30,8 +30,6 @@ export class TransactionService {
   private apiUrl: string;
 
   constructor(private http: HttpClient) {
-    // Support for environment-based API URL configuration
-    // When running with Docker: backend is accessible at localhost:3000
     const apiBase = (window as any)['API_URL'] || 'http://localhost:3000';
     this.apiUrl = `${apiBase}/transactions`;
   }
