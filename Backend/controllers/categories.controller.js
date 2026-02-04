@@ -43,8 +43,17 @@ export const getCategoriesById = async (req, res, next) => {
 export const createCategory = async (req, res, next) => {
   try {
     const validatedData = createCategorySchema.parse(req.body);
-    const category = await service.createCategory(validatedData);
-    res.status(201).json(category);
+    const existingCategories = await service.getCategories();
+
+    const categoryExists = existingCategories.some(cat => cat.label === req.body.label);
+    
+    if (!categoryExists) {
+      const category = await service.createCategory(validatedData);
+      res.status(201).json(category);
+    } else {
+      return res.status(409).json({ error: "Catégorie déjà existante" });
+    }
+    
   } catch (err) {
     if (err instanceof z.ZodError) {
       return handleZodError(err, res);
