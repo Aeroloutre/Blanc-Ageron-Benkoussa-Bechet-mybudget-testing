@@ -7,9 +7,6 @@ import categoryRoutes from "./routes/categories.route.js";
 import budgetRoutes from "./routes/budgets.route.js";
 import dbRoutes from "./routes/db.route.js";
 import db from "./db.js";
-console.log("🟢 Imports OK");
-
-console.log("🟢 dbRoutes importé");
 
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
@@ -43,6 +40,7 @@ app.use("/transactions", transactionRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/budgets", budgetRoutes);
 app.use("/database", dbRoutes);
+console.log("✅ Routes /database montées");
 
 // Le middleware d'errreur centarlisé
 app.use(errorMiddleware);
