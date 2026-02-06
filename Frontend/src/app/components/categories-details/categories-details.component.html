@@ -1,21 +1,98 @@
 <div class="details-container" *ngIf="category && !loading">
   <div class="header">
     <button class="btn-back" routerLink="/categories">← Retour</button>
-    <div class="title-section">
-      <h1 *ngIf="!isEditingName">{{ category.label }}</h1>
-      <input 
-        *ngIf="isEditingName" 
-        type="text" 
-        [(ngModel)]="editedName" 
-        (blur)="saveCategoryName()" 
-        (keyup.enter)="saveCategoryName()" 
-        (keyup.escape)="cancelEdit()" 
-        class="edit-input"
-        #nameInput
-      />
-      <button class="btn-edit" (click)="toggleEditName()" title="Modifier le nom">
-        <img src="modification-du-stylo.png" alt="Modifier" />
-      </button>
+    
+    <div class="header-content">
+      <!-- Section nom de la catégorie -->
+      <div class="category-name-card">
+        <div class="card-content">
+          <div class="card-header">
+            <span class="card-label">Catégorie</span>
+            <button class="btn-edit-inline" (click)="toggleEditName()" title="Modifier le nom" *ngIf="!isEditingName">
+              <img src="modification-du-stylo.png" alt="Modifier" />
+            </button>
+          </div>
+          <div class="card-body">
+            <h1 *ngIf="!isEditingName">{{ category.label }}</h1>
+            <input 
+              *ngIf="isEditingName" 
+              type="text" 
+              [(ngModel)]="editedName" 
+              (blur)="saveCategoryName()" 
+              (keyup.enter)="saveCategoryName()" 
+              (keyup.escape)="cancelEdit()" 
+              class="input-field input-name"
+              placeholder="Nom de la catégorie"
+              #nameInput
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section budget -->
+      <div class="budget-card">
+        <div class="card-content">
+          <div class="card-header">
+            <span class="card-label">Budget alloué</span>
+            <button class="btn-edit-inline" (click)="toggleEditBudget()" [title]="budget ? 'Modifier le budget' : 'Allouer un budget'" *ngIf="!isEditingBudget && budget">
+              <img src="modification-du-stylo.png" alt="Modifier" />
+            </button>
+          </div>
+          
+          <!-- Affichage du budget existant -->
+          <div class="card-body" *ngIf="!isEditingBudget && budget">
+            <div class="budget-amount">{{ budget.allocated_amount }} €</div>
+            <div class="budget-period">
+              <span class="period-label">Période:</span>
+              <span class="period-dates">{{ budget.period_start | date:'dd/MM/yyyy' }} - {{ budget.period_end | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <!-- Pas de budget alloué -->
+          <div class="card-body no-budget" *ngIf="!isEditingBudget && !budget">
+            <p class="no-budget-message">Aucun budget alloué</p>
+            <button class="btn-allocate-budget" (click)="toggleEditBudget()">+ Allouer un budget</button>
+          </div>
+
+          <!-- Formulaire de création/modification -->
+          <div class="card-body budget-edit-form" *ngIf="isEditingBudget">
+            <div class="form-field">
+              <label>Montant (€)</label>
+              <input 
+                type="number" 
+                [(ngModel)]="editedBudgetAmount" 
+                min="0"
+                step="0.01"
+                class="input-field"
+                placeholder="0.00"
+                #budgetInput
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Début</label>
+                <input 
+                  type="date" 
+                  [(ngModel)]="editedPeriodStart" 
+                  class="input-field input-date"
+                />
+              </div>
+              <div class="form-field">
+                <label>Fin</label>
+                <input 
+                  type="date" 
+                  [(ngModel)]="editedPeriodEnd" 
+                  class="input-field input-date"
+                />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-save" (click)="saveBudget()">✓ Sauvegarder</button>
+              <button class="btn-cancel" (click)="cancelEditBudget()">✕ Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

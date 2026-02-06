@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { DbService } from '../../services/db.service';
 
 @Component({
   selector: 'app-db',
+  imports: [CommonModule],
   templateUrl: './db.component.html',
   styleUrls: ['./db.component.css']
 })
