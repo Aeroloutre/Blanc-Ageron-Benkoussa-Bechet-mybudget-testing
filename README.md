@@ -77,10 +77,17 @@ docker compose up --build
 ---
 # TESTS
 
+**⚠️ Les tests doivent être lancés dans le conteneur Docker.**
+
 ```bash
-cd Backend
-npm test                  # Lancer tous les tests
-npm run test:coverage     # Voir la couverture (objectif : 80%)
+# Tous les tests
+docker exec backend npm test
+
+# Couverture de tests (objectif : 80%)
+docker exec backend npm run test:coverage
+
+# Test spécifique
+docker exec backend npm test -- tests/budget-alerte/budgets.alerts.test.js
 ```
 
 ---

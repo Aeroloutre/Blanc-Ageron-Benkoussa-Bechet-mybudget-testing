@@ -45,8 +45,8 @@ describe('Budget Alerts - Real DB Tests', () => {
     const myAlert = alerts.find(a => a.budget_id === testBudgetId);
     expect(myAlert).toBeDefined();
     expect(myAlert.status).toBe('WARNING');
-    expect(myAlert.percetage_used).toBeCloseTo(80);
-    expect(myAlert.spent_amount).toBe(255);
+    expect(parseFloat(myAlert.percent_used)).toBeCloseTo(85, 0);
+    expect(parseFloat(myAlert.spent_amount)).toBe(255);
   });
 
   test('getBudgetAlerts retourne OverBudget en cas de dépassement du budget', async () => {
@@ -61,11 +61,11 @@ describe('Budget Alerts - Real DB Tests', () => {
     const alerts = await getBudgetAlerts();
     const myAlert = alerts.find(a => a.budget_id === testBudgetId)
     expect(myAlert).toBeDefined();
-    expect(myAlert.status).toBe('Over_BUDGET');
-    expect(myAlert.spent_amount).toBe(350);
+    expect(myAlert.status).toBe('OVER_BUDGET');
+    expect(parseFloat(myAlert.spent_amount)).toBe(350);
   });
 
-  test('checkBudgetAfter Transaction retourne une alerte apres la creation de la transaction', async () => {
+  test('checkBudgetAfterTransaction retourne une alerte apres la creation de la transaction', async () => {
     await createTransaction({
       amount: 290,
       type: 'expense',

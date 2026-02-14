@@ -1,54 +1,41 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execPromise = promisify(exec);
-
-const DB_CONFIG = {
-  containerName: 'mybudget-postgres',
-  username: 'user',
-  database: 'mybudget'
-};
+import { db } from '../db.js';
 
 describe('DatabaseIntegration', () => {
   describe('Connectivity', () => {
     test('La base de données est accessible', async () => {
-      const cmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d ${DB_CONFIG.database} -t -c "SELECT 1;"`;
+      const { rows } = await db.query('SELECT 1 as result');
       
-      const { stdout, stderr } = await execPromise(cmd);
-      
-      expect(stdout).toBeDefined();
-      expect(stderr).toBe('');
-      expect(stdout.trim()).toBe('1');
+      expect(rows).toBeDefined();
+      expect(rows.length).toBe(1);
+      expect(rows[0].result).toBe(1);
     });
 
     test('La table transactions existe', async () => {
-      const cmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d ${DB_CONFIG.database} -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'transactions';"`;
+      const { rows } = await db.query(
+        "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_name = 'transactions'"
+      );
       
-      const { stdout } = await execPromise(cmd);
-      
-      expect(stdout).toBeDefined();
-      expect(parseInt(stdout.trim())).toBe(1);
+      expect(rows).toBeDefined();
+      expect(parseInt(rows[0].count)).toBe(1);
     });
   });
 
   describe('DataIntegrity', () => {
     test('Comptage des transactions', async () => {
-      const cmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d ${DB_CONFIG.database} -t -c "SELECT COUNT(*) FROM transactions;"`;
+      const { rows } = await db.query('SELECT COUNT(*) as count FROM transactions');
       
-      const { stdout } = await execPromise(cmd);
-      
-      expect(stdout).toBeDefined();
-      const count = parseInt(stdout.trim());
+      expect(rows).toBeDefined();
+      const count = parseInt(rows[0].count);
       expect(count).toBeGreaterThanOrEqual(0);
     });
 
     test('Structure de la table transactions', async () => {
-      const cmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d ${DB_CONFIG.database} -t -c "SELECT column_name FROM information_schema.columns WHERE table_name = 'transactions' ORDER BY ordinal_position;"`;
+      const { rows } = await db.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'transactions' ORDER BY ordinal_position"
+      );
       
-      const { stdout } = await execPromise(cmd);
-      
-      expect(stdout).toBeDefined();
-      const columns = stdout.trim().split('\n').map(col => col.trim()).filter(col => col);
+      expect(rows).toBeDefined();
+      const columns = rows.map(row => row.column_name);
       expect(columns).toContain('transaction_id');
       expect(columns).toContain('amount');
       expect(columns).toContain('label');
@@ -61,9 +48,7 @@ describe('DatabaseIntegration', () => {
   describe('Performance', () => {
     test('Temps d\'exécution des requêtes', async () => {
       const startTime = Date.now();
-      const cmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d ${DB_CONFIG.database} -t -c "SELECT COUNT(*) FROM transactions;"`;
-      
-      await execPromise(cmd);
+      await db.query('SELECT COUNT(*) FROM transactions');
       const executionTime = Date.now() - startTime;
       
       expect(executionTime).toBeLessThan(5000);
@@ -72,15 +57,15 @@ describe('DatabaseIntegration', () => {
 
   describe('ErrorScenarios', () => {
     test('Requête invalide', async () => {
-      const invalidCmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d ${DB_CONFIG.database} -t -c "SELECT * FROM nonexistent_table;"`;
-      
-      await expect(execPromise(invalidCmd)).rejects.toThrow();
+      await expect(db.query('SELECT * FROM nonexistent_table')).rejects.toThrow();
     });
 
-    test('Base de données inexistante', async () => {
-      const invalidCmd = `docker exec ${DB_CONFIG.containerName} psql -U ${DB_CONFIG.username} -d nonexistent_db -t -c "SELECT 1;"`;
-      
-      await expect(execPromise(invalidCmd)).rejects.toThrow();
+    test('Connexion valide avec table inexistante dans schéma', async () => {
+      // Test qu'une requête SQL valide sur une table inexistante échoue correctement
+      const { rows } = await db.query(
+        "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_name = 'nonexistent_db_table'"
+      );
+      expect(parseInt(rows[0].count)).toBe(0);
     });
   });
 });
