@@ -1,24 +1,86 @@
-import { jest } from '@jest/globals';
+import { db } from '../../db.js';
+import { getBudgetAlerts, checkBudgetAfterTransaction, createBudget } from '../../services/budgets.service.js';
+import { createTransaction } from '../../services/transactions.service.js';
+import { createCategory } from '../../services/categories.service.js';
 
-const mockQuery = jest.fn();
-jest.unstable_mockModule('../../db.js', () => ({ db: { query: mockQuery } }));
+describe('Budget Alerts - Real DB Tests', () => {
+  let testCategoryId;
+  let testBudgetId;
 
-const { getBudgetAlerts, checkBudgetAfterTransaction } = await import('../../services/budgets.service.js');
-
-describe('Budget Alerts', () => {
-  beforeEach(() => mockQuery.mockClear());
-
-  test('getBudgetAlerts retourne alertes WARNING et OVER_BUDGET', async () => {
-    mockQuery.mockResolvedValue({ rows: [{ status: 'WARNING' }] });
-    const alerts = await getBudgetAlerts();
-    expect(alerts).toHaveLength(1);
+  beforeAll(async () => {
+    // Créer une catégorie de test
+    const category = await createCategory({ label: 'Test Alimentation Alerts' });
+    testCategoryId = category.category_id;
   });
 
-  test('checkBudgetAfterTransaction détecte dépassement', async () => {
-    mockQuery.mockResolvedValue({ rows: [{ allocated_amount: 300, spent_amount: 290 }] });
-    const result = await checkBudgetAfterTransaction({
-      category_id: 4, amount: 20, transaction_date: '2026-01-15', type: 'expense'
+  beforeEach(async () => {
+    const budget = await createBudget({
+      category_id: testCategoryId,
+      allocated_amount: 300,
+      period_start: '2026-02-01',
+      period_end: '2026-02-28'
     });
-    expect(result.alert).toBe(true);
+    testBudgetId = budget.budget_id;
   });
+
+  afterEach(async () => {
+    await db.query('DELETE FROM transactions WHERE category_id = $1', [testCategoryId]);
+    await db.query('DELETE FROM budgets WHERE category_id = $1', [testCategoryId]);
+  });
+
+  afterAll(async () => {
+    await db.query('DELETE FROM categories WHERE category_id = $1', [testCategoryId]);
+  });
+
+  test('getBudgetAlerts retourne une alerte quand le budget est  80%', async () => {
+    await createTransaction({
+      amount: 255,
+      type: 'expense',
+      category_id: testCategoryId,
+      transaction_date: '2026-02-10',
+      label: 'Test dépense Warning'
+    });
+
+    const alerts = await getBudgetAlerts();
+    const myAlert = alerts.find(a => a.budget_id === testBudgetId);
+    expect(myAlert).toBeDefined();
+    expect(myAlert.status).toBe('WARNING');
+    expect(parseFloat(myAlert.percent_used)).toBeCloseTo(85, 0);
+    expect(parseFloat(myAlert.spent_amount)).toBe(255);
+  });
+
+  test('getBudgetAlerts retourne OverBudget en cas de dépassement du budget', async () => {
+    await createTransaction({
+      amount: 350,
+      type: 'expense',
+      category_id: testCategoryId,
+      transaction_date: '2026-02-15',
+      label: 'Test OverBudget'
+    });
+
+    const alerts = await getBudgetAlerts();
+    const myAlert = alerts.find(a => a.budget_id === testBudgetId)
+    expect(myAlert).toBeDefined();
+    expect(myAlert.status).toBe('OVER_BUDGET');
+    expect(parseFloat(myAlert.spent_amount)).toBe(350);
+  });
+
+  test('checkBudgetAfterTransaction retourne une alerte apres la creation de la transaction', async () => {
+    await createTransaction({
+      amount: 290,
+      type: 'expense',
+      category_id: testCategoryId,
+      transaction_date: '2026-02-20',
+      label: 'Dépense existante'
+
+    }); 
+
+    const alert = await checkBudgetAfterTransaction({
+      amount: 20, 
+      type: 'expense',
+      category_id: testCategoryId,
+      transaction_date:'2026-02-21',
+      label: 'Dépense test alerte'
+    });
+  });  
 });
