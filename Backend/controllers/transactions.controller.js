@@ -35,7 +35,7 @@ const getTransactionsQuerySchema = z.object({
 });
 
 const idParamSchema = z.object({
-  id: z.string().regex(/^\d+$/, "L'ID doit être un ID valable").transform(Number),
+  id: z.coerce.number().int("L'ID doit être un entier valide"),
 });
 
 export const createTransaction = async (req, res, next) => {

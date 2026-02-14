@@ -1,0 +1,23 @@
+<div class="database-settings">
+  <div class="danger-zone">
+    <h3>⚠️ Zone dangereuse</h3>
+    <p class="warning-text">
+      Cette action supprimera toutes les données de la base de données de manière irréversible.
+    </p>
+
+    <button 
+      (click)="deleteAllData()" 
+      [disabled]="isDeleting"
+      class="btn-delete"
+      type="button">
+      {{ isDeleting ? 'Suppression en cours...' : 'Supprimer toutes les données' }}
+    </button>
+
+    <div *ngIf="message" 
+         class="message"
+         [class.success]="messageType === 'success'" 
+         [class.error]="messageType === 'error'">
+      {{ message }}
+    </div>
+  </div>
+</div>

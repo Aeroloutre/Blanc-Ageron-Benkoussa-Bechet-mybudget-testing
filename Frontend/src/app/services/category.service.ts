@@ -17,12 +17,9 @@ export class CategoryService {
   constructor(private http: HttpClient) {
     const apiBase = (window as any)['API_URL'] || 'http://localhost:3000';
     this.apiUrl = `${apiBase}/categories`;
-    console.log('[CategoryService] Initialized with API URL:', this.apiUrl);
-    console.log('[CategoryService] window.API_URL:', (window as any)['API_URL']);
   }
 
   getCategories(): Observable<Category[]> {
-    console.log('[CategoryService] Fetching categories from:', this.apiUrl);
     return this.http.get<Category[]>(this.apiUrl);
   }
 
@@ -31,8 +28,6 @@ export class CategoryService {
   }
 
   createCategory(category: { label: string }): Observable<Category> {
-    console.log('[CategoryService] Creating category:', category);
-    console.log('[CategoryService] POST URL:', this.apiUrl);
     return this.http.post<Category>(this.apiUrl, category);
   }
 

@@ -50,6 +50,11 @@ To get the coverage, launch the command:
 ng test --code-coverage
 ```
 
+To launch the US test: use the command: 
+```bash
+ng test --include='**/test_BDD/**/*.spec.ts'
+```
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:
